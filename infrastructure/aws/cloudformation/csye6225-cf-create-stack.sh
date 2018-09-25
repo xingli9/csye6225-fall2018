@@ -22,11 +22,6 @@ $3
 $4 
 $5
 "
-
-
-
-
-
 csye6225VPC="$1Csye6225Vpc"
 csye6225InternetGateway="$1Csye6225InternetGateway"
 csye6225RouteTable="$1Csye6225PublicRouteTable"
@@ -91,17 +86,11 @@ Resources:
       RouteTableId: !Ref $csye6225RouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref $csye6225InternetGateway
-
-
 EOF
 
 #csye6225VPC="$1Csye6225Vpc"
 #csye6225InternetGateway="$1Csye6225InternetGateway"
 #csye6225RouteTable="$1Csye6225PublicRouteTable"
-
-
-
-
 
 echo "Creating cloudformation stack $1..........."
 echo "Creating Resource $csye6225VPC......."
@@ -134,8 +123,6 @@ do
        status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
 
 done
-
-
 
 echo "$1 Stack_Create_Complete !!"
 
