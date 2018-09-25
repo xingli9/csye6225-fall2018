@@ -119,6 +119,10 @@ if [ $? -ne 0 ];then
         echo "Failed..."
         exit 1
 fi
-echo "Done!!
+echo "Done!!"
 
-Delete_Complete!!"
+
+echo "Deleting $1.log file......."
+rm $1.log 
+
+echo "Delete_Complete!!"
