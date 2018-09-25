@@ -1,12 +1,17 @@
 #!/bin/bash 
 
 
+#Created on Sep 24, 2018
+#@author: Li
+
+
 display_usage()
 {
 echo "Usage:$0 [StackName] [VPC_CidrBlock] [Subnet1] [Subnet2] [Subnet3]"
 }
 
-if [ $# -lt 5 ];then 
+if [ $# -lt 5 ];then
+        echo "missing argument"	
 	display_usage
 	exit 1
 fi
@@ -19,19 +24,15 @@ $5
 "
 
 
+
+
+
 csye6225VPC="$1Csye6225Vpc"
 csye6225InternetGateway="$1Csye6225InternetGateway"
 csye6225RouteTable="$1Csye6225PublicRouteTable"
 
-
-echo "
-$csye6225VPC
-$csye6225InternetGateway,
-$csye6225RouteTable"
-
-
-
 echo "Generating cloudFormation template $1-csye6225-cf-networking.yml...."
+
 
 cat >$1-csye6225-cf-networking.yml<<EOF
 
@@ -94,7 +95,51 @@ Resources:
 
 EOF
 
+#csye6225VPC="$1Csye6225Vpc"
+#csye6225InternetGateway="$1Csye6225InternetGateway"
+#csye6225RouteTable="$1Csye6225PublicRouteTable"
+
+
+
+
 
 echo "Creating cloudformation stack $1..........."
+echo "Creating Resource $csye6225VPC......."
+echo "Creating Resource csye6225Subnet1 csye6225Subnet2 csye6225Subnet3......"
+echo "Creating Resource $csye6225InternetGateway........"
+echo "Creating Resource $csye6225RouteTable......."
 
-#aws cloudformation create-stack --stack-name $1 --template-body file://$1-csye6225-cf-networking.yml
+stackID=$(aws cloudformation create-stack --stack-name $1 --template-body file://$1-csye6225-cf-networking.yml| grep StackId) 
+
+if [ -z "$stackID" ];then 
+	echo "Falied to create stack $1"
+	exit 1
+fi
+
+
+status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
+
+
+while [ "$status" != "CREATE_COMPLETE" ]
+do
+
+       echo "StackStatus: $status"
+
+       if [ "$status" == "ROLLBACK_COMPLETE" ];then 
+	       echo "$1 Stack_Create_Uncomplete !!"
+	       exit 1
+       fi
+
+       sleep 3
+       status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
+
+done
+
+
+
+echo "$1 Stack_Create_Complete !!"
+
+exit 0
+
+
+
