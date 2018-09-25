@@ -10,8 +10,7 @@ display_usage()
 echo "Usage:$0 [StackName] [VPC_CidrBlock] [Subnet1] [Subnet2] [Subnet3]"
 }
 
-if [ $# -lt 5 ];then
-        echo "missing argument"	
+if [ $# -lt 5 ];then	
 	display_usage
 	exit 1
 fi
@@ -26,7 +25,7 @@ csye6225VPC="$1Csye6225Vpc"
 csye6225InternetGateway="$1Csye6225InternetGateway"
 csye6225RouteTable="$1Csye6225PublicRouteTable"
 
-echo "Generating cloudFormation template $1-csye6225-cf-networking.yml...."
+echo "Generating cloudFormation template '$1-csye6225-cf-networking.yml'....."
 
 
 cat >$1-csye6225-cf-networking.yml<<EOF
@@ -120,7 +119,7 @@ do
        fi
 
        sleep 3
-       status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
+       status=$(aws cloudformation describe-stacks --stack-name  $1 2>&1 | grep StackStatus| cut -d'"' -f4)
 
 done
 
