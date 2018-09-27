@@ -2,6 +2,9 @@
 
 
 team member info:
+zihao zheng
+email： zheng.z@husky.neu.edu
+
 LiYing Cheng
 cheng.li@husky.neu.edu
 
