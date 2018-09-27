@@ -87,9 +87,6 @@ Resources:
       GatewayId: !Ref $csye6225InternetGateway
 EOF
 
-#csye6225VPC="$1Csye6225Vpc"
-#csye6225InternetGateway="$1Csye6225InternetGateway"
-#csye6225RouteTable="$1Csye6225PublicRouteTable"
 
 echo "Creating cloudformation stack $1..........."
 echo "Creating Resource $csye6225VPC......."
