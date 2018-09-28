@@ -7,7 +7,7 @@ Liying Cheng
 cheng.li@husky.neu.edu
 
 zihao zheng
-email： zheng.z@husky.neu.edu
+zheng.z@husky.neu.edu
 
 Xing Li 
 li.xing1@husky.ueu.edu
