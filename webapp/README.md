@@ -36,4 +36,3 @@ Assess the service by providing auth header:
 curl  -u username:password “localhost:8080?/currentTime”
 
 
-
