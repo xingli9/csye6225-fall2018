@@ -5,7 +5,7 @@
 display_usage()
 {
 
-echo "$0 [StackName]"
+echo "Usage:$0 [StackName]"
 
 }
 

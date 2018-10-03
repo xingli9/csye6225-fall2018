@@ -3,15 +3,15 @@
 
 display_usage()
 {
-echo "Usage:$0 [StackName] [SSH_Key] [DB_UserName] [DB_Password]"
+echo "Usage:$0 [StackName]"
 }
 
-if [ $# -lt 4 ];then
+if [ $# -lt 1 ];then
 	display_usage
 	exit 1
 fi
 
-stackID=$(aws cloudformation create-stack --template-body file://csye6225-cf-application.yml --stack-name $1 --parameters ParameterKey=KeyName,ParameterValue=$2 ParameterKey=DBuserName,ParameterValue=$3 ParameterKey=DBpassword,ParameterValue=$4| grep StackId)
+stackID=$(aws cloudformation create-stack --template-body file://csye6225-cf-application.yml --stack-name $1 --parameters  file://cf-application.conf| grep StackId)
 
 if [ -z "$stackID" ];then 
 	echo failed
@@ -22,9 +22,7 @@ fi
 echo " 
 Creating VPCSecurityGroup........
 Creating EC2Instance.....
-Creating DBSecurityGroup........
-Creating DBSubnetGroup..........
-Creating RDSInstance............
+Creating DBSecurityGroup.........
 "
 
 status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
