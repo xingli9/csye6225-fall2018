@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class VanillaApplication {
+public class StartApplication {
     
 
     @Bean
@@ -34,7 +34,7 @@ Arrays.asList(new Role("USER"), new Role("ACTUATOR")),//roles
     }    
 
     public static void main(String[] args) {
-        SpringApplication.run(VanillaApplication.class, args);
+        SpringApplication.run(StartApplication.class, args);
     }
 
 }

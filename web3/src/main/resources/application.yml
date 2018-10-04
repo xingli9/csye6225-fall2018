@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Vanilla
+    name: csye6225
 security:
     user:
       password: password
