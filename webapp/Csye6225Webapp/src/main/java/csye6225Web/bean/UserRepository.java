@@ -1,8 +1,6 @@
-package csye6225Web;
+package csye6225Web.bean;
 
 import org.springframework.data.repository.CrudRepository;
-import csye6225Web.User;
-
 
 
 public interface UserRepository extends CrudRepository<User,Integer>{ }
