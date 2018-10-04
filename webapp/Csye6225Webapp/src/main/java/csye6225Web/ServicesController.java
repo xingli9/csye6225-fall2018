@@ -66,8 +66,11 @@ public class ServicesController {
     @GetMapping(path="/user/register")
     public @ResponseBody String userRegister(@RequestParam String userName, @RequestParam String password)
     {
-
-
+        for (User a:userRepository.findAll()) {
+            if(a.getUserName().equals(userName)) {
+                return "User name has already existed!\n";
+            }
+        }
             String  hashPassword= BCrypt.hashpw(password,BCrypt.gensalt());
             User user = new User();
             user.setUserName(userName);
