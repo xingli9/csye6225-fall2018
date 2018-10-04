@@ -20,6 +20,7 @@ public class MainControl {
 
 
     @Bean
+    //@Override
     public CommandLineRunner setupDefaultUser(UserService service) {
         return args -> {
             service.save(new User(
