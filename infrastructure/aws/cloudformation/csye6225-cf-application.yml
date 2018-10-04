@@ -1,0 +1,93 @@
+
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  vpcID:
+    Type: String
+  subnetID:
+    Type: String
+  HostedZoneName:
+    Type: String    
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      SubnetId: !Ref subnetID
+      SecurityGroupIds:
+      - Ref: WebAppSecurityGroup
+      KeyName:
+        Ref: KeyName
+      ImageId: ami-0ff8a91507f77f867
+  WebAppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH and HTTP
+      VpcId: !Ref vpcID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+  IPAddress:
+    Type: AWS::EC2::EIP
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId:
+        Ref: EC2Instance
+      EIP:
+        Ref: IPAddress
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable datebase.service port 3306
+      VpcId: !Ref vpcID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: 0.0.0.0/0
+  myDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref HostedZoneName
+      Comment: DNS name for webApp
+      Name: !Ref HostedZoneName
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !Ref IPAddress
+
+
+
+
+       #  myDBSubnetGroup:
+       #    Type: AWS::RDS::DBSubnetGroup
+       #    Properties:
+       #      DBSubnetGroupDescription: DataBase for WebApp
+       #      SubnetIds: 
+       #      - subnet-0d9da3c0e5bd5051e
+       #      - subnet-06a51e76e1650594e
+       #      - subnet-0502d08fed0eb429e
+       #  MyDB:
+       #    Type: AWS::RDS::DBInstance
+       #    Properties:
+       #      DBName: MyDatabase
+       #      AllocatedStorage: '5'
+       #      DBInstanceClass: db.t2.micro
+       #      Engine: MariaDB
+       #      MasterUsername: !Ref DBuserName
+       #      MasterUserPassword: !Ref DBpassword
+       #      DBSubnetGroupName: !Ref myDBSubnetGroup
+       #      VPCSecurityGroups: 
+       #      - !Ref DBSecurityGroup
+
+
+
+

@@ -39,18 +39,21 @@ Resources:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: $3
+      AvailabilityZone: us-east-1a
       VpcId:
         Ref: $csye6225VPC
   csye6225Subnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: $4
+      AvailabilityZone: us-east-1b
       VpcId:
         Ref: $csye6225VPC
   csye6225Subnet3:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: $5
+      AvailabilityZone: us-east-1c
       VpcId:
         Ref: $csye6225VPC
   $csye6225InternetGateway:
