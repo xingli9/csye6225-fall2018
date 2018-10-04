@@ -1,9 +1,12 @@
-//package repository;
-//
-//import org.springframework.data.repository.CrudRepository;
-//import models.User;
-//
-//
-//
-//
-//public interface UserRepository extends CrudRepository<User,Integer>{ }
+package csye6225Web.repositories;
+
+import csye6225Web.models.User;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * User repository for CRUD operations.
+ */
+public interface UserRepository extends JpaRepository<User,Long> {
+    Optional<User> findByUsername(String username);
+}

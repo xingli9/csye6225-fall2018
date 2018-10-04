@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -29,14 +30,14 @@ public class TransactionController {
     }
 
 
- //   @GetMapping("/transactions/{id}")
-    @RequestMapping(value="/transactions/{id}", method = RequestMethod.GET,produces ="application/json")
-    @ResponseBody
+//    @RequestMapping(value="/transactions/{id}", method = RequestMethod.GET,produces ="application/json")
+//    @ResponseBody
+    @GetMapping("/transaction/{id}")
     public ResponseEntity<Object> getTransaction(@PathVariable(value="id") long id) {
 
-       Transaction transaction=transactionRepository.findOne(id);
+       Optional<Transaction> transaction=transactionRepository.findById(id);
 
-        if (transaction==null) {
+        if (!transaction.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id NOT FOUND\n");
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(transaction);
@@ -65,9 +66,9 @@ public class TransactionController {
     public ResponseEntity<Object> updateTransaction(@RequestBody Transaction transaction ,@PathVariable long id)
     {
 
-        Transaction old_transaction=transactionRepository.findOne(id);
+       Optional<Transaction> old_transaction=transactionRepository.findById(id);
 
-        if(old_transaction==null)
+        if(!old_transaction.isPresent())
         {
             return ResponseEntity.notFound().build();
         }
@@ -87,14 +88,14 @@ public class TransactionController {
     public ResponseEntity<Object> deleteTransaction(@PathVariable Long id)
     {
 
-        Transaction transaction=transactionRepository.findOne(id);
-        if (transaction==null)
+        Optional<Transaction> transaction=transactionRepository.findById(id);
+        if (!transaction.isPresent())
         {
             return ResponseEntity.notFound().build();
         }
         else
         {
-            transactionRepository.delete(id);
+            transactionRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete_Success!!\n");
         }
 
