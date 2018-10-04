@@ -16,5 +16,11 @@ import lombok.ToString;
 public class Role extends BaseEntity{
 
     private String name;
-    
+    private String ROLE_;
+    private String USER;
+
+    public String Role(String name) {
+        this.name = name;
+        return name;
+    }
 }
