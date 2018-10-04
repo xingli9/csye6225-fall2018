@@ -22,7 +22,7 @@ public class StartApplication {
             service.save(new User(
                     "user", //username
                     "user", //password
-Arrays.asList(new Role("USER"), new Role("ACTUATOR")),//roles 
+Arrays.asList(new Role("USER"), new Role("ACTUATOR")),//roles
                     true//Active
             ));
         };

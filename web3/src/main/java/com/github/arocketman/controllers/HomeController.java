@@ -17,4 +17,9 @@ public class HomeController {
         return "Private area";
     }
 
+    @GetMapping(value = "/private/p")
+    public String privatArea(){
+        return "Private area";
+    }
+
 }
