@@ -52,36 +52,36 @@ public class Transaction {
         return description;
     }
 
-
     public String getMerchant() {
         return merchant;
     }
 
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public void setDate(String date) {
         this.date = date;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 
     public void setMerchant(String merchant) {
         this.merchant = merchant;
     }
-
 }
+
+
 
 
