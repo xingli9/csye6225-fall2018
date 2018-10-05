@@ -17,7 +17,7 @@ import java.util.Arrays;
 @SpringBootApplication
 public class MainControl {
 
-
+/*
 
     @Bean
     public CommandLineRunner setupDefaultUser(UserService service) {
@@ -30,7 +30,7 @@ public class MainControl {
             ));
         };
     }
-
+*/
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
