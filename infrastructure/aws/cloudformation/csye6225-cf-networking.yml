@@ -1,0 +1,59 @@
+
+Resources:
+  MyNetworkCsye6225Vpc:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 192.168.0.0/16
+  csye6225Subnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.0.0/24
+      AvailabilityZone: us-east-1a
+      VpcId:
+        Ref: MyNetworkCsye6225Vpc
+  csye6225Subnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.0/24
+      AvailabilityZone: us-east-1b
+      VpcId:
+        Ref: MyNetworkCsye6225Vpc
+  csye6225Subnet3:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.2.0/24
+      AvailabilityZone: us-east-1c
+      VpcId:
+        Ref: MyNetworkCsye6225Vpc
+  MyNetworkCsye6225InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+  VPCGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref MyNetworkCsye6225Vpc
+      InternetGatewayId: !Ref MyNetworkCsye6225InternetGateway
+  MyNetworkCsye6225PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyNetworkCsye6225Vpc
+  SubnetRouteAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      SubnetId: !Ref csye6225Subnet1
+  SubnetRouteAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      SubnetId: !Ref csye6225Subnet2
+  SubnetRouteAssociation3:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      SubnetId: !Ref csye6225Subnet3
+  AddGatewayRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyNetworkCsye6225InternetGateway

@@ -9,6 +9,16 @@ Parameters:
     Type: String
   HostedZoneName:
     Type: String    
+  DBuserName:
+    Type: String
+  DBpassword:
+    Type: String    
+  subnetID1:
+    Type: String
+  subnetID2:
+    Type: String
+  subnetID3:
+    Type: String        
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -23,7 +33,7 @@ Resources:
   WebAppSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH and HTTP
+      GroupDescription: Enable SSH, HTTP and HTTPS
       VpcId: !Ref vpcID
       SecurityGroupIngress:
       - IpProtocol: tcp
@@ -33,6 +43,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: '80'
         ToPort: '80'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '443'
+        ToPort: '443'
         CidrIp: 0.0.0.0/0
   IPAddress:
     Type: AWS::EC2::EIP

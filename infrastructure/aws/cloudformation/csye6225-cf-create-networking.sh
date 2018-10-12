@@ -28,7 +28,7 @@ csye6225RouteTable="$1Csye6225PublicRouteTable"
 echo "Generating cloudFormation template '$1-csye6225-cf-networking.yml'....."
 
 
-cat >$1-csye6225-cf-networking.yml<<EOF
+cat >csye6225-cf-networking.yml<<EOF
 
 Resources:
   $csye6225VPC:

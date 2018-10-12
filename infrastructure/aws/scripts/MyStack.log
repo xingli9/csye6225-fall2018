@@ -1,9 +1,0 @@
-vpcid vpc-0b35280cee753dde0
-subnet1 subnet-03c95ce9e48e6316f
-subnet2 subnet-09fe9a1e7237331d5
-subnet3 subnet-06fcd78d4a870358f
-internetGateway igw-09a6c438098bb37d2
-routetable rtb-00d8bf9cc209f4dbf
-assocID1 rtbassoc-0a070fc1cf7709063
-assocID2 rtbassoc-0e80376dcc3da2376
-assocID3 rtbassoc-0bfde845e87b72b91

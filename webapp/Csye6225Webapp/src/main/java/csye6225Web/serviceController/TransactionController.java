@@ -1,5 +1,8 @@
 package csye6225Web.serviceController;
+
+import csye6225Web.models.Receipt;
 import csye6225Web.models.Transaction;
+import csye6225Web.repositories.ReceiptRepository;
 import csye6225Web.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,24 +22,23 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+
+    @Autowired
+    private ReceiptRepository receiptRepository;
+
     @GetMapping("/transactions")
     public List<Transaction> getAllTransactions() {
 
-        List<Transaction> allTransList = new ArrayList<>();
-        transactionRepository.findAll().forEach(allTransList::add);
-
-        return allTransList;
+        return transactionRepository.findAll();
 
     }
 
 
-//    @RequestMapping(value="/transactions/{id}", method = RequestMethod.GET,produces ="application/json")
-//    @ResponseBody
+
     @GetMapping("/transaction/{id}")
-    public ResponseEntity<Object> getTransaction(@PathVariable(value="id") long id) {
+    public ResponseEntity<Object> getTransaction(@PathVariable(value="id") Long id) {
 
        Optional<Transaction> transaction=transactionRepository.findById(id);
-
         if (!transaction.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id NOT FOUND\n");
         } else {
@@ -50,12 +52,17 @@ public class TransactionController {
     public ResponseEntity<Object> createNewTransaction(@RequestBody Transaction transaction) {
 
         try {
+
+            for(Receipt r:transaction.getAttachments())
+            {
+                r.setTransaction(transaction);
+            }
+
             transactionRepository.save(transaction);
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
 
         } catch (Exception e)
         {
-
             return ResponseEntity.badRequest().build();
         }
 
@@ -63,10 +70,11 @@ public class TransactionController {
 
 
     @PutMapping("/transaction/{id}")
-    public ResponseEntity<Object> updateTransaction(@RequestBody Transaction transaction ,@PathVariable long id)
+    public ResponseEntity<Object> updateTransaction(@RequestBody Transaction transaction ,@PathVariable Long id)
     {
 
-       Optional<Transaction> old_transaction=transactionRepository.findById(id);
+
+        Optional<Transaction> old_transaction=transactionRepository.findById(id);
 
         if(!old_transaction.isPresent())
         {
@@ -74,9 +82,15 @@ public class TransactionController {
         }
         else
         {
-              transaction.setId(id);
+
+            transaction.setId(id);
+            for(Receipt r: transaction.getAttachments())
+            {
+                r.setTransaction(transaction);
+            }
+
               transactionRepository.save(transaction);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Update Success!!\n");
+              return ResponseEntity.status(HttpStatus.CREATED).body("Update Success!!\n");
         }
     }
 
@@ -95,6 +109,10 @@ public class TransactionController {
         }
         else
         {
+            for(Receipt r:transaction.get().getAttachments())
+            {
+                receiptRepository.delete(r);
+            }
             transactionRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete_Success!!\n");
         }
