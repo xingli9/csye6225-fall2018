@@ -9,6 +9,16 @@ Parameters:
     Type: String
   HostedZoneName:
     Type: String    
+  DBuserName:
+    Type: String
+  DBpassword:
+    Type: String    
+  subnetID1:
+    Type: String
+  subnetID2:
+    Type: String
+  subnetID3:
+    Type: String        
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -23,7 +33,7 @@ Resources:
   WebAppSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH and HTTP
+      GroupDescription: Enable SSH, HTTP and HTTPS
       VpcId: !Ref vpcID
       SecurityGroupIngress:
       - IpProtocol: tcp
@@ -34,6 +44,10 @@ Resources:
         FromPort: '80'
         ToPort: '80'
         CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '443'
+        ToPort: '443'
+        CidrIp: 0.0.0.0/0
   IPAddress:
     Type: AWS::EC2::EIP
   IPAssoc:
@@ -43,16 +57,6 @@ Resources:
         Ref: EC2Instance
       EIP:
         Ref: IPAddress
-  DBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable datebase.service port 3306
-      VpcId: !Ref vpcID
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: '3306'
-        ToPort: '3306'
-        CidrIp: 0.0.0.0/0
   myDNSRecord:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -63,31 +67,54 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !Ref IPAddress
-
-
-
-
-       #  myDBSubnetGroup:
-       #    Type: AWS::RDS::DBSubnetGroup
-       #    Properties:
-       #      DBSubnetGroupDescription: DataBase for WebApp
-       #      SubnetIds: 
-       #      - subnet-0d9da3c0e5bd5051e
-       #      - subnet-06a51e76e1650594e
-       #      - subnet-0502d08fed0eb429e
-       #  MyDB:
-       #    Type: AWS::RDS::DBInstance
-       #    Properties:
-       #      DBName: MyDatabase
-       #      AllocatedStorage: '5'
-       #      DBInstanceClass: db.t2.micro
-       #      Engine: MariaDB
-       #      MasterUsername: !Ref DBuserName
-       #      MasterUserPassword: !Ref DBpassword
-       #      DBSubnetGroupName: !Ref myDBSubnetGroup
-       #      VPCSecurityGroups: 
-       #      - !Ref DBSecurityGroup
-
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'csye6225-fall2018-chengl.me.csye6225.com'
+      AccessControl: PublicRead
+  myDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: 'id'
+        AttributeType:  'S'
+      KeySchema:
+      - AttributeName: 'id'
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable datebase.service port 3306
+      VpcId: !Ref vpcID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: 0.0.0.0/0
+  myDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: csye6225 webApp
+      SubnetIds:
+      - !Ref subnetID1
+      - !Ref subnetID2
+      - !Ref subnetID3
+  MyDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: csye6225
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t2.medium
+      DBInstanceIdentifier: 'csye6225-spring2018'
+      Engine: MySQL
+      MasterUsername: !Ref DBuserName
+      MasterUserPassword: !Ref DBpassword
+      DBSubnetGroupName: !Ref myDBSubnetGroup
+      VPCSecurityGroups:
+      - !Ref DBSecurityGroup
 
 
 

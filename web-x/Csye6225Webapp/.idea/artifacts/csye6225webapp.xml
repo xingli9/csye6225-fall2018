@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" build-on-make="true" name="csye6225webapp">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="csye6225webapp.war">
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/WEB-INF" />
+    </root>
+  </artifact>
+</component>
