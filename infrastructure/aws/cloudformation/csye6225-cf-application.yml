@@ -18,7 +18,9 @@ Parameters:
   subnetID2:
     Type: String
   subnetID3:
-    Type: String        
+    Type: String
+  instanceProfile:
+    Type: String    
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -29,7 +31,64 @@ Resources:
       - Ref: WebAppSecurityGroup
       KeyName:
         Ref: KeyName
-      ImageId: ami-0ff8a91507f77f867
+      ImageId: ami-9887c6e7
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - "\n"
+          - - "#!/bin/bash -xe "
+            - yum install ruby ntp wget java-1.8.0-openjdk-devel -y
+            - systemctl start ntpd
+            - systemctl enable ntpd
+            - groupadd tomcat
+            - useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat
+            - cd /tmp
+            - wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
+            - mkdir /opt/tomcat
+            - tar xvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1
+            - cd /opt/tomcat
+            - chgrp -R tomcat /opt/tomcat
+            - chmod -R g+r conf
+            - chmod g+x conf
+            - chown -R tomcat webapps/ work/ temp/ logs/
+            - cd /usr/lib/systemd/system
+            - touch tomcat.service
+            - echo '[Unit]' > tomcat.service
+            - echo 'Description=Apache Tomcat Web Application Container' >> tomcat.service
+            - echo 'After=syslog.target network.target' >> tomcat.service
+            - echo '[Service]' >> tomcat.service
+            - echo 'Type=forking' >> tomcat.service
+            - echo 'Environment=JAVA_HOME=/usr/lib/jvm/jre' >> tomcat.service
+            - echo 'Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid' >> tomcat.service
+            - echo 'Environment=CATALINA_HOME=/opt/tomcat' >> tomcat.service
+            - echo 'Environment=CATALINA_BASE=/opt/tomcat' >> tomcat.service
+            - echo 'Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"'
+              >> tomcat.service
+            - echo 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"'
+              >> tomcat.service
+            - echo 'ExecStart=/opt/tomcat/bin/startup.sh' >> tomcat.service
+            - echo 'ExecStop=/bin/kill -15 $MAINPID' >> tomcat.service
+            - echo 'User=tomcat' >> tomcat.service
+            - echo 'Group=tomcat' >> tomcat.service
+            - echo 'UMask=0007' >> tomcat.service
+            - echo 'RestartSec=10' >> tomcat.service
+            - echo 'Restart=always' >> tomcat.service
+            - echo '[Install]' >> tomcat.service
+            - echo 'WantedBy=multi-user.target' >> tomcat.service
+            - systemctl daemon-reload
+            - "#systemctl start cloudwatch.service"
+            - "#systemctl enable cloudwatch.service"
+            - systemctl enable tomcat.service
+            - systemctl start tomcat.service
+            - cd /home/centos/
+            - wget http://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+            - chmod +x ./install 
+            - ./install auto
+      IamInstanceProfile: !Ref instanceProfile
+      Tags:
+        -
+          Key: "Name"
+          Value: "MyApp"
   WebAppSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -47,6 +106,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: '443'
         ToPort: '443'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '8080'
+        ToPort: '8080'
         CidrIp: 0.0.0.0/0
   IPAddress:
     Type: AWS::EC2::EIP
@@ -108,8 +171,8 @@ Resources:
       DBName: csye6225
       AllocatedStorage: '5'
       DBInstanceClass: db.t2.medium
-      DBInstanceIdentifier: 'csye6225-spring2018'
-      Engine: MySQL
+      DBInstanceIdentifier: 'leo-csye6225-spring2018'
+      Engine: MariaDB
       MasterUsername: !Ref DBuserName
       MasterUserPassword: !Ref DBpassword
       DBSubnetGroupName: !Ref myDBSubnetGroup
@@ -117,4 +180,11 @@ Resources:
       - !Ref DBSecurityGroup
 
 
+Outputs:
+  DBEndPoint:
+    Value: 
+      Fn::GetAtt:
+      - MyDB
+      - Endpoint.Address
+    Description: MyDB endpoint address
 

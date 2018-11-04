@@ -36,3 +36,22 @@ Assess the service by providing auth header:
 curl  -u username:password “localhost:8080?/currentTime”
 
 
+Get access_token: 
+curl -u my-trusted-client:secret  -d "grant_type=password&username=user&password=user" -X POST 'localhost:8080/oauth/token'
+
+CREATE/POST:
+curl -iX POST 'localhost:8080/transaction' -H "Authorization: Bearer {access_token}" -H "Content-Type: application/json" -d @transaction.json 
+
+UPDATE/PUT
+curl -iX PUT 'localhost:8080/transaction/{id}' -H "Authorization: Bearer {access_token}" -H "Content-Type: application/json" -d @transaction.json
+
+RETRIVE/GET:
+curl -iX GET 'localhost:8080/transaction/{id}' -H "Authorization: Bearer {access_token}"
+
+REMOVE/DELETE
+curl -iX DELETE 'localhost:8080/transaction/{id}' -H "Authorization: Bearer {access_token}"
+
+
+
+
+

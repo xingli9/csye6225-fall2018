@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+
+usage()
+{
+	echo "
+	Usage:$0 [URL] [(PostContent).json]
+	Example: $0 csye6225-fall2018-chengl.me:8080/csye6225Webapp-1.0-SNAPSHOT/transaction/{id} transaction2.json
+  
+	"
+}
+
+
+if [ $# -lt 2 ];then
+	usage
+        exit 1
+fi
+
+url=$1
+
+
+
+
+
+curl -iX PUT "$url"  -H "Content-Type: application/json" -d @$2
+

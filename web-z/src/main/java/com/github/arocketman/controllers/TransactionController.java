@@ -1,7 +1,9 @@
 package com.github.arocketman.controllers;
 
 import com.github.arocketman.entities.Transaction;
+import com.github.arocketman.entities.Receipt;
 import com.github.arocketman.repositories.TransactionRepository;
+import com.github.arocketman.repositories.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,26 +22,24 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+
+    @Autowired
+    private ReceiptRepository receiptRepository;
+
     @GetMapping("/transactions")
     public List<Transaction> getAllTransactions() {
 
-        List<Transaction> allTransList = new ArrayList<>();
-        transactionRepository.findAll().forEach(allTransList::add);
-
-        return allTransList;
+        return transactionRepository.findAll();
 
     }
 
 
-    //   @GetMapping("/transactions/{id}")
-    @RequestMapping(value="/transactions/{id}", method = RequestMethod.GET,produces ="application/json")
-    @ResponseBody
-    public ResponseEntity<Object> getTransaction(@PathVariable(value="id") long id) {
 
-       // Transaction transaction=transactionRepository.findOne(id);
+    @GetMapping("/transaction/{id}")
+    public ResponseEntity<Object> getTransaction(@PathVariable(value="id") Long id) {
+
         Optional<Transaction> transaction=transactionRepository.findById(id);
-
-        if (transaction.get()==null) {
+        if (!transaction.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id NOT FOUND\n");
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(transaction);
@@ -52,12 +52,17 @@ public class TransactionController {
     public ResponseEntity<Object> createNewTransaction(@RequestBody Transaction transaction) {
 
         try {
+
+            for(Receipt r:transaction.getAttachments())
+            {
+                r.setTransaction(transaction);
+            }
+
             transactionRepository.save(transaction);
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
 
         } catch (Exception e)
         {
-
             return ResponseEntity.badRequest().build();
         }
 
@@ -65,18 +70,25 @@ public class TransactionController {
 
 
     @PutMapping("/transaction/{id}")
-    public ResponseEntity<Object> updateTransaction(@RequestBody Transaction transaction ,@PathVariable long id)
+    public ResponseEntity<Object> updateTransaction(@RequestBody Transaction transaction ,@PathVariable Long id)
     {
+
 
         Optional<Transaction> old_transaction=transactionRepository.findById(id);
 
-        if(old_transaction.get()==null)
+        if(!old_transaction.isPresent())
         {
             return ResponseEntity.notFound().build();
         }
         else
         {
+
             transaction.setId(id);
+            for(Receipt r: transaction.getAttachments())
+            {
+                r.setTransaction(transaction);
+            }
+
             transactionRepository.save(transaction);
             return ResponseEntity.status(HttpStatus.CREATED).body("Update Success!!\n");
         }
@@ -90,14 +102,17 @@ public class TransactionController {
     public ResponseEntity<Object> deleteTransaction(@PathVariable Long id)
     {
 
-        //Transaction transaction=transactionRepository.findOne(id);
         Optional<Transaction> transaction=transactionRepository.findById(id);
-        if (transaction.get()==null)
+        if (!transaction.isPresent())
         {
             return ResponseEntity.notFound().build();
         }
         else
         {
+            for(Receipt r:transaction.get().getAttachments())
+            {
+                receiptRepository.delete(r);
+            }
             transactionRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete_Success!!\n");
         }

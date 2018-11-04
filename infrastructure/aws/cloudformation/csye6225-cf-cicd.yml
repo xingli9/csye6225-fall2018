@@ -1,0 +1,177 @@
+
+Resources:
+  EC2S3Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: Code-DeployEC2-S3-Policy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:*
+          - cloudformation:*
+          Resource: "*"
+      Roles:
+      - !Ref EC2ServiceRole 
+  
+  
+        #  CodeDeployPolicy:
+        #    Type: AWS::IAM::Policy
+        #    Properties:
+        #      PolicyName: CodeDeployPolicy
+        #      PolicyDocument:
+        #        Statement:
+        #        - Effect: Allow
+        #          Action:
+        #          - autoscaling:PutLifecycleHook
+        #          - autoscaling:DeleteLifecycleHook
+        #          - autoscaling:RecordLifecycleActionHeartbeat
+        #          - autoscaling:CompleteLifecycleAction
+        #          - autoscaling:DescribeAutoscalingGroups
+        #          - autoscaling:PutInstanceInStandby
+        #          - autoscaling:PutInstanceInService
+        #          - ec2:Describe*
+        #          Resource: "*"
+        #      Roles:
+        #      - !Ref CodeDeployServiceRole
+
+
+  TravisUploadToS3:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: Travis-Upload-To-S3
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:*
+          Resource: "*"
+      Users:
+      - !Ref CIUser
+
+  TravisToCodeDeploy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: Travis-To-CodeDeploy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - codedeploy:RegisterApplicationRevision
+          - codedeploy:GetApplicationRevision
+          - codedeploy:*
+          Resource:
+          - arn:aws:codedeploy:us-east-1:398590284929:application:MyCodeDeployApp
+        - Effect: Allow
+          Action:
+          - codedeploy:CreateDeployment
+          - codedeploy:GetDeployment
+          - codedeploy:*
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - codedeploy:GetDeploymentConfig
+          - codedeploy:*
+          Resource:
+          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.OneAtATime
+          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.HalfAtATime
+          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.AllAtOnce
+      Users:
+      - !Ref CIUser
+
+
+  CIUser:
+    Type: AWS::IAM::User
+ 
+
+  CIUserKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName:
+        Ref: CIUser
+
+
+  EC2ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+
+
+  CodeDeployServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+              - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole 
+
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - Ref: EC2ServiceRole
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'code-deploy.csye6225-fall2018-leocheng.me'
+      AccessControl: PublicRead
+
+
+
+  CodeDeployApp:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: "MyCodeDeployApp"
+
+
+  CodeDeployGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref CodeDeployApp
+      DeploymentGroupName: "MyCodeDeployGroup"
+      ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+      Ec2TagFilters: 
+        - 
+          Key: "Name"
+          Value:  "MyApp"
+          Type: KEY_AND_VALUE
+
+          
+Outputs:
+  EC2InstacneProfile:
+    Value:
+      Ref: InstanceProfile
+    Description: webapp EC2 Instance Profile
+  AccessKey:
+    Value:
+      Ref: CIUserKeys
+    Description: AWSAccessKeyId of travis ci user
+  SecretKey:
+    Value:
+      Fn::GetAtt:
+      - CIUserKeys
+      - SecretAccessKey
+    Description: AWSSecretKey of travis ci user
+
+
+
+
+
+

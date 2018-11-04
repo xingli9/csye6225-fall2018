@@ -19,11 +19,11 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private AuthenticationManager authenticationManager;
+//
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     /**
      * Setting up the endpointsconfigurer authentication manager.
@@ -31,29 +31,29 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * @param endpoints
      * @throws Exception
      */
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints
-                .authenticationManager(authenticationManager);
-    }
+//    @Override
+//    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+//        endpoints
+//                .authenticationManager(authenticationManager);
+//    }
 
     /**
      * Setting up the clients with a clientId, a clientSecret, a scope, the grant types and the authorities.
      * @param clients
      * @throws Exception
      */
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                .inMemory()
-                .withClient("my-trusted-client")
-                .authorizedGrantTypes("client_credentials", "password")
-                .authorities("ROLE_CLIENT","ROLE_TRUSTED_CLIENT")
-                .scopes("read","write","trust")
-                .resourceIds("oauth2-resource")
-                .accessTokenValiditySeconds(5000)
-                .secret(passwordEncoder.encode("secret"));
-    }
+//    @Override
+//    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//        clients
+//                .inMemory()
+//                .withClient("my-trusted-client")
+//                .authorizedGrantTypes("client_credentials", "password")
+//                .authorities("ROLE_CLIENT","ROLE_TRUSTED_CLIENT")
+//                .scopes("read","write","trust")
+//                .resourceIds("oauth2-resource")
+//                .accessTokenValiditySeconds(5000)
+//                .secret(passwordEncoder.encode("secret"));
+//    }
 
     /**
      * We here defines the security constraints on the token endpoint.
@@ -61,11 +61,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * @param security the AuthorizationServerSecurityConfigurer.
      * @throws Exception
      */
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security
-                .checkTokenAccess("isAuthenticated()");
-    }
+//    @Override
+//    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+//        security
+//                .checkTokenAccess("isAuthenticated()");
+//    }
 
 
 }

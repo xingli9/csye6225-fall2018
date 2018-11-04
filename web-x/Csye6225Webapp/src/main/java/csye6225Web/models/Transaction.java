@@ -2,6 +2,7 @@ package csye6225Web.models;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -11,31 +12,73 @@ public class Transaction {
 
     @Id
     @GeneratedValue
-    private Long id;
-    private Integer userid;
+    private String id;
+
+    //@ManyToOne
+
+    private String user_id;
     private String description;
     private String merchant;
     private String amount;
     private String date;
     private String category;
-    private long receiptid;
+    @OneToMany(mappedBy = "transaction",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Receipt> attachments=new ArrayList<>();
 
 
     public Transaction() {
     }
 
-
-    public Transaction(Long id, Integer userid, String description, String merchant,
-                       String amount, String date, String category) {
+    public Transaction(String id, String description, String merchant, String amount, String date, String category, String user_id) {
         this.id = id;
-        this.userid = userid;
-        this.merchant = merchant;
         this.description = description;
+        this.merchant = merchant;
         this.amount = amount;
         this.date = date;
         this.category = category;
-        //this.receipt = receipt;
+        this.user_id = user_id;
+    }
 
+    public Transaction(String id, String description, String merchant,
+                       String amount, String date, String category, String user_id, ArrayList<Receipt> attachments) {
+        this.id = id;
+        //this.user = new User();
+        this.description = description;
+        this.merchant = merchant;
+        this.amount = amount;
+        this.date = date;
+        this.category = category;
+        this.user_id = user_id;
+        this.attachments=attachments;
+
+    }
+
+    public void addReceipt(Receipt receipt)
+    {
+        this.attachments.add(receipt);
+        receipt.setTransaction(this);
+    }
+
+    public void removeReceipt(Receipt receipt)
+    {
+        this.attachments.remove(receipt);
+        receipt.setTransaction(null);
+
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+    public List<Receipt> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Receipt> attachments) {
+        this.attachments = attachments;
     }
 
     public String getAmount() {
@@ -50,7 +93,7 @@ public class Transaction {
         return date;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -63,19 +106,7 @@ public class Transaction {
         return merchant;
     }
 
-
-
-    public Integer getUserid() {
-        return userid;
-    }
-
-    public void setUserid(Integer userid) {
-        this.userid = userid;
-    }
-
-
-
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -97,6 +128,24 @@ public class Transaction {
 
     public void setMerchant(String merchant) {
         this.merchant = merchant;
+    }
+
+
+    @Override
+    public String toString() {
+        String rst = "";
+        rst += this.id + "  ";
+        rst += this.description + "  ";
+        rst += this.amount + "  ";
+        rst += this.date + "  ";
+        rst += this.merchant + "  ";
+        rst += this.category + "  ";
+        List<Receipt> receipts = this.getAttachments();
+        for (Receipt rc:receipts) {
+            rst += rc.getId() + "  ";
+            rst += rc.getUrl() + "  ";
+        }
+        return rst;
     }
 
 }

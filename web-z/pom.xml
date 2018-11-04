@@ -6,7 +6,9 @@
     <groupId>com.github.arocketman</groupId>
     <artifactId>vanilla</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
+
+
 
     <name>Vanilla</name>
     <description>Calcettomania</description>
@@ -110,6 +112,8 @@
             </plugin>
         </plugins>
     </build>
+
+
 
 
 </project>

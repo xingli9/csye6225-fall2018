@@ -1,6 +1,6 @@
 
 Resources:
-  MyNetworkCsye6225Vpc:
+  LeoNetworkCsye6225Vpc:
     Type: 'AWS::EC2::VPC'
     Properties:
       CidrBlock: 192.168.0.0/16
@@ -10,50 +10,65 @@ Resources:
       CidrBlock: 192.168.0.0/24
       AvailabilityZone: us-east-1a
       VpcId:
-        Ref: MyNetworkCsye6225Vpc
+        Ref: LeoNetworkCsye6225Vpc
   csye6225Subnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 192.168.1.0/24
       AvailabilityZone: us-east-1b
       VpcId:
-        Ref: MyNetworkCsye6225Vpc
+        Ref: LeoNetworkCsye6225Vpc
   csye6225Subnet3:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 192.168.2.0/24
       AvailabilityZone: us-east-1c
       VpcId:
-        Ref: MyNetworkCsye6225Vpc
-  MyNetworkCsye6225InternetGateway:
+        Ref: LeoNetworkCsye6225Vpc
+  LeoNetworkCsye6225InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
   VPCGatewayAttachment:
     Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
-      VpcId: !Ref MyNetworkCsye6225Vpc
-      InternetGatewayId: !Ref MyNetworkCsye6225InternetGateway
-  MyNetworkCsye6225PublicRouteTable:
+      VpcId: !Ref LeoNetworkCsye6225Vpc
+      InternetGatewayId: !Ref LeoNetworkCsye6225InternetGateway
+  LeoNetworkCsye6225PublicRouteTable:
     Type: 'AWS::EC2::RouteTable'
     Properties:
-      VpcId: !Ref MyNetworkCsye6225Vpc
+      VpcId: !Ref LeoNetworkCsye6225Vpc
   SubnetRouteAssociation1:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      RouteTableId: !Ref LeoNetworkCsye6225PublicRouteTable
       SubnetId: !Ref csye6225Subnet1
   SubnetRouteAssociation2:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      RouteTableId: !Ref LeoNetworkCsye6225PublicRouteTable
       SubnetId: !Ref csye6225Subnet2
   SubnetRouteAssociation3:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      RouteTableId: !Ref LeoNetworkCsye6225PublicRouteTable
       SubnetId: !Ref csye6225Subnet3
   AddGatewayRoute:
     Type: 'AWS::EC2::Route'
     Properties:
-      RouteTableId: !Ref MyNetworkCsye6225PublicRouteTable
+      RouteTableId: !Ref LeoNetworkCsye6225PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref MyNetworkCsye6225InternetGateway
+      GatewayId: !Ref LeoNetworkCsye6225InternetGateway
+
+Outputs:
+  VPCId:
+    Description: vpcID
+    Value: !Ref LeoNetworkCsye6225Vpc
+  SubnetID1:
+    Description: SubnetID_1
+    Value: !Ref csye6225Subnet1
+  SubnetID2:
+    Description: SubnetID_2
+    Value: !Ref csye6225Subnet2
+  SubnetID3:
+    Description: SubnetID_3
+    Value: !Ref csye6225Subnet3
+

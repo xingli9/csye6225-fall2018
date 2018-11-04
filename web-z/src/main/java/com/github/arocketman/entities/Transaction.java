@@ -2,6 +2,8 @@ package com.github.arocketman.entities;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -11,18 +13,21 @@ public class Transaction {
     @Id
     @GeneratedValue
     private Long id;
+
     private String description;
     private String merchant;
     private String amount;
     private String date;
     private String category;
 
+    @OneToMany(mappedBy = "transaction",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Receipt> attachments=new ArrayList<>();
 
 
     public Transaction(){}
 
 
-    public Transaction(Long id, String description, String merchant, String amount, String date, String category)
+    public Transaction(Long id, String description, String merchant, String amount, String date, String category,ArrayList<Receipt> attachments)
     {
         this.id=id;
         this.merchant=merchant;
@@ -30,6 +35,20 @@ public class Transaction {
         this.amount=amount;
         this.date=date;
         this.category=category;
+        this.attachments=attachments;
+
+    }
+
+    public void addReceipt(Receipt receipt)
+    {
+        this.attachments.add(receipt);
+        receipt.setTransaction(this);
+    }
+
+    public void removeReceipt(Receipt receipt)
+    {
+        this.attachments.remove(receipt);
+        receipt.setTransaction(null);
 
     }
 
@@ -53,34 +72,39 @@ public class Transaction {
         return description;
     }
 
-
     public String getMerchant() {
         return merchant;
     }
 
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
+    public List<Receipt> getAttachments() {
+        return attachments;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
     public void setMerchant(String merchant) {
         this.merchant = merchant;
     }
 
+    public void setAttachments(List<Receipt> attachments) {
+        this.attachments = attachments;
+    }
 }

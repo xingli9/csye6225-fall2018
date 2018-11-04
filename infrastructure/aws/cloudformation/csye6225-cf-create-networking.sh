@@ -88,6 +88,21 @@ Resources:
       RouteTableId: !Ref $csye6225RouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref $csye6225InternetGateway
+
+Outputs:
+  VPCId:
+    Description: vpcID
+    Value: !Ref $csye6225VPC
+  SubnetID1:
+    Description: SubnetID_1
+    Value: !Ref csye6225Subnet1
+  SubnetID2:
+    Description: SubnetID_2
+    Value: !Ref csye6225Subnet2
+  SubnetID3:
+    Description: SubnetID_3
+    Value: !Ref csye6225Subnet3
+
 EOF
 
 
@@ -97,7 +112,7 @@ echo "Creating Resource csye6225Subnet1 csye6225Subnet2 csye6225Subnet3......"
 echo "Creating Resource $csye6225InternetGateway........"
 echo "Creating Resource $csye6225RouteTable......."
 
-stackID=$(aws cloudformation create-stack --stack-name $1 --template-body file://$1-csye6225-cf-networking.yml| grep StackId) 
+stackID=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-networking.yml| grep StackId) 
 
 if [ -z "$stackID" ];then 
 	echo "Falied to create stack $1"

@@ -48,5 +48,7 @@ done
 
 echo "$1 Stack_Create_Complete !!"
 
+
+aws cloudformation describe-stacks --stack-name  $1| grep OutputValue
 exit 0
 

@@ -1,0 +1,17 @@
+version: 0.0
+os: linux
+
+files:             
+  - source: ./csye6225Webapp-1.0-SNAPSHOT.war
+    destination: /opt/tomcat/webapps
+
+hooks:
+  AfterInstall:
+   - location: ./afterInstall.sh
+     timeout: 180
+     runas: centos
+  ApplicationStart:
+   - location: ./applicationStart.sh
+     timeout: 180
+     runas: centos
+
