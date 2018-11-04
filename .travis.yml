@@ -1,0 +1,65 @@
+language: java
+jdk:
+  - oraclejdk8
+    
+sudo: false
+    
+install: true
+    
+script:
+  - pwd
+  - ls -a
+  - echo spring.datasource.url=jdbc:mariadb://${DB_EndPoint}:3306/csye6225 >> webapp/Csye6225Webapp/src/main/resources/application.properties
+  - echo SECRET_KEY=${secret_access_key} >> webapp/Csye6225Webapp/src/main/resources/application.properties
+  - echo ACCESS_KEY=${access_key_id} >> webapp/Csye6225Webapp/src/main/resources/application.properties
+  - cat webapp/Csye6225Webapp/src/main/resources/application.properties
+  - pwd
+  - ls -a
+  - cd webapp/Csye6225Webapp/
+  - pwd
+  - ls -a
+  - mvn clean
+  - mvn install -DskipTests=true
+  - cd target/
+  - pwd
+  - ls -a 
+  - cd ../../../
+  - pwd
+  - ls -a
+    
+after_success:
+  - pwd
+  - ls -al
+  - cp webapp/Csye6225Webapp/target/csye6225Webapp-1.0-SNAPSHOT.war .
+  - mkdir codedeploy_artifact
+  - zip -r csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip csye6225Webapp-1.0-SNAPSHOT.war *.yml *.sh
+  - ls -al
+  - mv csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip codedeploy_artifact/
+  - ls -al
+  - pwd
+  - cd codedeploy_artifact
+  - ls -al
+  - pwd
+  - cd ..
+  - pwd
+  - ls -al
+    
+deploy:
+  - provider: s3
+    local_dir: codedeploy_artifact
+    bucket: $s3_bucket
+    region: us-east-1
+    skip_cleanup: true
+    access_key_id: $access_key_id
+    secret_access_key: $secret_access_key
+    
+  - provider: codedeploy
+    access_key_id: $access_key_id
+    bucket: $s3_bucket
+    key: csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip
+    bundle_type: zip
+    application: $application
+    deployment_group: $deployment_group
+    region: us-east-1
+    secret_access_key: $secret_access_key
+    wait-until-deployed: true
