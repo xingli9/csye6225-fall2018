@@ -21,7 +21,9 @@ public class AWSRDSImpl implements AWSRDSDao {
         return instance;
     }
     String FIND_ALL_TABLES = "SHOW TABLES";
-    String DROP_TABLE = "DROP TABLE ?;";
+    String DROP_TABLE_USER = "DROP TABLE user;";
+    String DROP_TABLE_TRANSLATION = "DROP TABLE transaction_table;";
+    String DROP_TABLE_REPOSIT = "DROP TABLE receipts;";
     String CREATE_USER = "CREATE TABLE `user` (\n" +
             "  `userid` varchar(100) NOT NULL,\n" +
             "  `username` varchar(100) NOT NULL,\n" +
@@ -70,31 +72,31 @@ public class AWSRDSImpl implements AWSRDSDao {
             }
 
             if (tables.contains("user")) {
-                preStatement = connection.prepareStatement(DROP_TABLE);
-                preStatement.setString(1,"user");
-                preStatement.executeQuery();
-                preStatement = connection.prepareStatement(CREATE_USER);
-                preStatement.executeQuery();
-                System.out.println("Setup user successful!");
+                preStatement = connection.prepareStatement(DROP_TABLE_USER);
+                preStatement.execute();
             }
+            preStatement = connection.prepareStatement(CREATE_USER);
+            preStatement.executeUpdate();
+            System.out.println("Setup user successful!");
 
-            if (!tables.contains("transaction_table")) {
-                preStatement = connection.prepareStatement(DROP_TABLE);
-                preStatement.setString(1,"transaction_table");
-                preStatement.executeQuery();
+            if (tables.contains("transaction_table")) {
+                preStatement = connection.prepareStatement(DROP_TABLE_TRANSLATION);
+                preStatement.executeUpdate();
+            }
                 preStatement = connection.prepareStatement(CREATE_TRANSACTION_TABLE);
-                preStatement.executeQuery();
+                preStatement.executeUpdate();
                 System.out.println("Setup transaction successful!");
-            }
 
-            if (!tables.contains("receipts")) {
-                preStatement = connection.prepareStatement(DROP_TABLE);
-                preStatement.setString(1,"receipts");
-                preStatement.executeQuery();
-                preStatement = connection.prepareStatement(CREATE_RECEIPTS);
-                preStatement.executeQuery();
-                System.out.println("Setup receipt successful!");
+            if (tables.contains("receipts")) {
+                preStatement = connection.prepareStatement(DROP_TABLE_REPOSIT);
+                preStatement.executeUpdate();
             }
+            preStatement = connection.prepareStatement(CREATE_RECEIPTS);
+            preStatement.executeUpdate();
+            System.out.println("Setup receipt successful!");
+
+
+
             System.out.println("Setup database successful!");
 
         } catch (ClassNotFoundException e) {
