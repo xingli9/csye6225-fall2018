@@ -23,19 +23,22 @@ public class MyConnection {
 		PASSWORD = propertySource2.getProperty("spring.datasource.password").toString();
 	}
 
-	public static MyConnection getInstance() {
-		if (instance == null)
-			instance = new MyConnection();
-		return instance;
-	}
+//	public static MyConnection getInstance() {
+//		if (instance == null)
+//			instance = new MyConnection();
+//		return instance;
+//	}
 
 	private static String DRIVER = "org.mariadb.jdbc.Driver";
-	private static String URL = "jdbc:mysql://localhost:3306/csye6225";
-	private static String USER = "root";
-	private static String PASSWORD = "666666";
+	private static String URL;// = "jdbc:mysql://localhost:3306/csye6225";
+	private static String USER;// = "root";
+	private static String PASSWORD;// = "666666";
 
 	public static Connection getConnection() throws ClassNotFoundException, SQLException {
     	Class.forName(DRIVER);
+		if (instance == null) {
+			instance = new MyConnection();
+		}
 		System.out.println("username: -" + USER + "+ password: -" +  PASSWORD + "+url +" + URL);
     	return DriverManager.getConnection(URL, USER, PASSWORD);
 	}
