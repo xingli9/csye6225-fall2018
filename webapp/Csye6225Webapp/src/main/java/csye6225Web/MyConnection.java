@@ -36,6 +36,7 @@ public class MyConnection {
 
 	public static Connection getConnection() throws ClassNotFoundException, SQLException {
     	Class.forName(DRIVER);
+		System.out.println("username: -" + USER + "+ password: -" +  PASSWORD + "+url +" + URL);
     	return DriverManager.getConnection(URL, USER, PASSWORD);
 	}
 	
