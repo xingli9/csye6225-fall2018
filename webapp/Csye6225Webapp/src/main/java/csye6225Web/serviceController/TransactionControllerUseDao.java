@@ -113,10 +113,10 @@ public class TransactionControllerUseDao {
                 String url;
 
                 //save to local
-                url = local.saveFile(receipt);
+                //url = local.saveFile(receipt);
 
                 //save to aws s3
-                //url = awss3.uploadToS3(receipt);
+                url = awss3.uploadToS3(receipt);
 
                 List<Receipt> attachments = new ArrayList<>();
                 Receipt receipt1 = new Receipt(UUID.randomUUID().toString(), url);
