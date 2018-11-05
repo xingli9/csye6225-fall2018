@@ -30,9 +30,9 @@ script:
 after_success:
   - pwd
   - ls -al
-  - cp webapp/Csye6225Webapp/target/csye6225Webapp-1.0-SNAPSHOT.war .
+  - cp webapp/Csye6225Webapp/target/csye6225webapp.war .
   - mkdir codedeploy_artifact
-  - zip -r csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip csye6225Webapp-1.0-SNAPSHOT.war *.yml *.sh
+  - zip -r csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip csye6225webapp.war *.yml *.sh
   - ls -al
   - mv csye6225-web-app-${TRAVIS_JOB_NUMBER}.zip codedeploy_artifact/
   - ls -al
