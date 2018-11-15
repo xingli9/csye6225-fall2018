@@ -11,7 +11,7 @@ if [ $# -lt 1 ];then
 	exit 1
 fi
 
-stackID=$(aws cloudformation create-stack --template-body file://csye6225-cf-application.yml --stack-name $1 --parameters  file://csye6225-cf.conf| grep StackId)
+stackID=$(aws cloudformation create-stack --template-body file://csye6225-cf-serverless.yml --stack-name $1 | grep StackId)
 
 if [ -z "$stackID" ];then 
 	echo failed
@@ -20,13 +20,8 @@ fi
 
 
 echo " 
-Creating VPCSecurityGroup........
-Creating EC2Instance.....
-Creating DBSecurityGroup.........
-Creating DBInstance.....
-Creating S3Bucket.........
-Creating DynamoDBTable.......
-Creating snsTopic....
+Creating SNStopic.........
+Creating LambdaInvokePermission.............
 "
 
 status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
@@ -50,6 +45,33 @@ done
 echo "$1 Stack_Create_Complete !!"
 
 
-aws cloudformation describe-stacks --stack-name  $1| grep OutputValue
-exit 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

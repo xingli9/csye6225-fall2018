@@ -84,6 +84,16 @@ Resources:
             - wget http://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
             - chmod +x ./install 
             - ./install auto
+            - yum makecache -y
+            - yum install unzip -y
+            - wget https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip
+            - unzip AmazonCloudWatchAgent.zip
+            - ./install.sh
+            - cd /opt/aws/amazon-cloudwatch-agent/bin/
+            - touch conf.json
+            - echo '{"agent":{"metrics_collection_interval":10,"logfile":"/var/logs/amazon-cloudwatch-agent.log"},"logs":{"logs_collected":{"files":{"collect_list":[{"file_path":"/opt/tomcat/logs/catalina.out","log_group_name":"csye6225_fall2018","log_stream_name":"webapp"}]}},"log_stream_name":"cloudwatch_log_stream"}}' >> conf.json
+            - ./amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:conf.json -s >> e.log
+            - cd /home/centos/
       IamInstanceProfile: !Ref instanceProfile
       Tags:
         -
@@ -134,19 +144,22 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: 'csye6225-fall2018-chengl.me.csye6225.com'
-      AccessControl: PublicRead
+      AccessControl: PublicRead    
+
   myDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: 'id'
-        AttributeType:  'S'
+      - AttributeName: 'userName'
+        AttributeType: 'S'
       KeySchema:
-      - AttributeName: 'id'
+      - AttributeName: 'userName'
         KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: "UserTable"
+
   DBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

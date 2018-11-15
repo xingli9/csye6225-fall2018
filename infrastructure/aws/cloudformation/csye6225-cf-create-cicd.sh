@@ -25,10 +25,12 @@ fi
 echo "
 Creating CodeDeployApplication........
 Creating DeploymentGroup.....
-Creating S3Bucket.........
+Creating codedeployS3Bucket.........
 Creating EC2ServiceRole.....
-Creating TravisCiUser....
+Creating CodedeployCIUser....
 Creating CodeDeployRole....
+Creating LambdaExecuationRole
+Creating LambdaCIUser
 "
 
 status=$(aws cloudformation describe-stacks --stack-name  $1| grep StackStatus| cut -d'"' -f4)
@@ -61,13 +63,26 @@ subnet3=$(cat /tmp/leonetwork.log| sed -n "4 p" | cut -d'"' -f4)
 
 aws cloudformation describe-stacks --stack-name  $1| grep OutputValue>>/tmp/leocicd.log
 
-secretKey=$(cat /tmp/leocicd.log|sed -n "1 p"| cut -d'"' -f4)
-instanceProfile=$(cat /tmp/leocicd.log|sed -n "2 p"| cut -d'"' -f4)
-accessKey=$(cat /tmp/leocicd.log|sed -n "3 p"|cut -d'"' -f4)
+codedeployCIsecretKey=$(cat /tmp/leocicd.log|sed -n "1 p"| cut -d'"' -f4)
+lambdaExecuationRole=$(cat /tmp/leocicd.log|sed -n "2 p"| cut -d'"' -f4)
+lambdaCIaccesskey=$(cat /tmp/leocicd.log|sed -n "3 p"|cut -d'"' -f4)
+lambdaCIsecretkey=$(cat /tmp/leocicd.log|sed -n "4 p"|cut -d'"' -f4)
+instanceProfile=$(cat /tmp/leocicd.log|sed -n "5 p"|cut -d'"' -f4)
+codedeployCIaccessKey=$(cat /tmp/leocicd.log|sed -n "6 p"|cut -d'"' -f4)
+
 
 echo "
-$accessKey 
-$secretKey"
+codeployCIUser:
+$codedeployCIaccessKey
+$codedeployCIsecretKey
+
+lambdaCIUser:
+$lambdaCIaccesskey
+$lambdaCIsecretkey
+
+lambdaExecuationRoleARN:
+$lambdaExecuationRole
+"
 
 cat >csye6225-cf.conf<<EOF
 
