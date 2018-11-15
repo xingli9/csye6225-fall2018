@@ -118,11 +118,11 @@ cat >csye6225-cf.conf<<EOF
 },
 {
  "ParameterKey": "KeyName",
- "ParameterValue": "csye6225Leo"
+ "ParameterValue": "xingli"
 },
 {
  "ParameterKey": "HostedZoneName",
- "ParameterValue": "csye6225-fall2018-chengl.me."
+ "ParameterValue": "csye6225-fall2018-lixing1.me."
 },
 
 {
