@@ -64,7 +64,7 @@ Resources:
           - codedeploy:GetApplicationRevision
           - codedeploy:*
           Resource:
-          - arn:aws:codedeploy:us-east-1:398590284929:application:MyCodeDeployApp
+          - arn:aws:codedeploy:us-east-1:124564112876:application:MyCodeDeployApp
         - Effect: Allow
           Action:
           - codedeploy:CreateDeployment
@@ -77,13 +77,13 @@ Resources:
           - codedeploy:GetDeploymentConfig
           - codedeploy:*
           Resource:
-          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.OneAtATime
-          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.HalfAtATime
-          - arn:aws:codedeploy:us-east-1:398590284929:deploymentconfig:CodeDeployDefault.AllAtOnce
+          - arn:aws:codedeploy:us-east-1:124564112876:deploymentconfig:CodeDeployDefault.OneAtATime
+          - arn:aws:codedeploy:us-east-1:124564112876:deploymentconfig:CodeDeployDefault.HalfAtATime
+          - arn:aws:codedeploy:us-east-1:124564112876:deploymentconfig:CodeDeployDefault.AllAtOnce
         - Effect: Allow
           Action:
           - SNS:Publish
-          Resource: arn:aws:sns:us-east-1:398590284929:Csye6225Topic
+          Resource: arn:aws:sns:us-east-1:124564112876:Csye6225Topic
         - Effect: Allow
           Action:
           - cloudwatch:*
@@ -142,7 +142,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: 'code-deploy.csye6225-fall2018-leocheng.me'
+      BucketName: 'code-deploy.csye6225-fall2018-lixing1.me'
       AccessControl: PublicRead
 
 
