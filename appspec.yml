@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:             
-  - source: ./csye6225Webapp-1.0-SNAPSHOT.war
+  - source: ./csye6225webapp.war
     destination: /opt/tomcat/webapps
 
 hooks:
