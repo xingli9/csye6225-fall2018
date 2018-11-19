@@ -77,7 +77,7 @@ public class UserService {
         AWSCredentials awsCredentials=new BasicAWSCredentials(ACCESS_KEY,SECRET_KEY);
         AmazonSNSClient snsClient= new AmazonSNSClient(awsCredentials);
 
-        String topicARN= "arn:aws:sns:us-east-1:398590284929:Csye6225Topic";
+        String topicARN= "arn:aws:sns:us-east-1:124564112876:Csye6225Topic";
         String msg=username+":"+ UUID.randomUUID().toString();
 
         PublishRequest publishRequest=new PublishRequest(topicARN,msg);
