@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class AWSS3Impl implements AWSS3 {
-    private static String BUCKET_NAME   = "csye6225-fall2018-chengl.me.csye6225.com";
+    private static String BUCKET_NAME   = "csye6225-fall2018-lixing1.me.csye6225.com";
     private static String ACCESS_KEY;
     private static String SECRET_KEY;
 
