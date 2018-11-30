@@ -1,57 +1,59 @@
 package csye6225Web.models;
 
+import com.fasterxml.jackson.annotation.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+
+
+
 
 
 @Entity
-@Table(name = "transaction_table")
+@Table(name="transaction_table")
 public class Transaction {
 
-    @Id
-    @GeneratedValue
-    private String id;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-    //@ManyToOne
+  private String description;
+  private String merchant;
+  private String amount;
+  private String date;
+  private String category;
 
-    private String user_id;
-    private String description;
-    private String merchant;
-    private String amount;
-    private String date;
-    private String category;
-    @OneToMany(mappedBy = "transaction",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Receipt> attachments=new ArrayList<>();
+  @OneToMany(mappedBy = "transaction",cascade = CascadeType.ALL,orphanRemoval = true)
+  private List<Receipt> attachments=new ArrayList<>();
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id",referencedColumnName = "id")
+  @OnDelete(action= OnDeleteAction.CASCADE)
+  @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "id")
+  @JsonIdentityReference(alwaysAsId = true)
+  @JsonProperty("user_id")
+  private User user;
 
 
-    public Transaction() {
-    }
+  public Transaction(){}
 
-    public Transaction(String id, String description, String merchant, String amount, String date, String category, String user_id) {
-        this.id = id;
-        this.description = description;
-        this.merchant = merchant;
-        this.amount = amount;
-        this.date = date;
-        this.category = category;
-        this.user_id = user_id;
-    }
 
-    public Transaction(String id, String description, String merchant,
-                       String amount, String date, String category, String user_id, ArrayList<Receipt> attachments) {
-        this.id = id;
-        //this.user = new User();
-        this.description = description;
-        this.merchant = merchant;
-        this.amount = amount;
-        this.date = date;
-        this.category = category;
-        this.user_id = user_id;
-        this.attachments=attachments;
+  public Transaction(Long id, String description, String merchant, String amount, String date, String category,ArrayList<Receipt> attachments)
+  {
+      this.id=id;
+      this.merchant=merchant;
+      this.description=description;
+      this.amount=amount;
+      this.date=date;
+      this.category=category;
+      this.attachments=attachments;
 
-    }
+  }
 
     public void addReceipt(Receipt receipt)
     {
@@ -66,19 +68,8 @@ public class Transaction {
 
     }
 
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
-    public List<Receipt> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Receipt> attachments) {
-        this.attachments = attachments;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getAmount() {
@@ -93,7 +84,7 @@ public class Transaction {
         return date;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -101,53 +92,43 @@ public class Transaction {
         return description;
     }
 
-
     public String getMerchant() {
         return merchant;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
+    public List<Receipt> getAttachments() {
+        return attachments;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
     public void setMerchant(String merchant) {
         this.merchant = merchant;
     }
 
-
-    @Override
-    public String toString() {
-        String rst = "";
-        rst += this.id + "  ";
-        rst += this.description + "  ";
-        rst += this.amount + "  ";
-        rst += this.date + "  ";
-        rst += this.merchant + "  ";
-        rst += this.category + "  ";
-        List<Receipt> receipts = this.getAttachments();
-        for (Receipt rc:receipts) {
-            rst += rc.getId() + "  ";
-            rst += rc.getUrl() + "  ";
-        }
-        return rst;
+    public void setAttachments(List<Receipt> attachments) {
+        this.attachments = attachments;
     }
-
 }
+
+
 
 

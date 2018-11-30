@@ -6,8 +6,21 @@ Feature:
 • REST APIs
 Get    /currentTime
 Post   /user/register
+Get /reset
+Get  /transactions
+Get /transaction/{id}
+Post /transaction
+Put /transaction/{id}
+DELETE transaction/{id}
+Get /transaction/{id}/attachments
+Post /transaction/{id}/attachment
+Put transaction/{id}/attachment/{attachmentID}
+DELETE transaction/{id}/attachment/{attachmentID}
+
 • Http Basic Authentication 
 • User password to be stored securely using BCrypt password hashing scheme
+
+
 
 Steps to setup, run and test application
 
@@ -50,6 +63,13 @@ curl -iX GET 'localhost:8080/transaction/{id}' -H "Authorization: Bearer {access
 
 REMOVE/DELETE
 curl -iX DELETE 'localhost:8080/transaction/{id}' -H "Authorization: Bearer {access_token}"
+
+
+
+Web Application Firewall Penetration Testing:
+
+DocumentLink:
+https://docs.google.com/document/d/1PRHynJcS4KeRVJE18ZMzF_qXtMWCOrT0RIASiyN9AGM/edit?usp=sharing
 
 
 

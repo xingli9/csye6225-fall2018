@@ -9,7 +9,6 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.*;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 
 

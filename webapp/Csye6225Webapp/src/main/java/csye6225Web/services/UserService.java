@@ -6,12 +6,11 @@ import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import csye6225Web.models.User;
+import csye6225Web.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.support.ResourcePropertySource;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import csye6225Web.repositories.UserRepository;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -19,14 +18,53 @@ import java.util.UUID;
 public class UserService {
 
     @Autowired
-    private UserRepository repo;
+    UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    public void save(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        repo.save(user);
+
+    public boolean userNameisValid(String username)
+    {
+        if(!username.contains("@"))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public User findUser(String username)
+    {
+        for(User u:userRepository.findAll())
+        {
+            if (u.getUsername().equals(username))
+            {
+                return u;
+            }
+        }
+        return null;
+    }
+
+
+    public void saveUser(String username, String password)
+    {
+        User user= new User();
+        user.setUsername(username);
+        user.setPassword(BCrypt.hashpw(password,BCrypt.gensalt()));
+        userRepository.save(user);
+    }
+
+
+    public boolean userIsValid(String username, String password)
+    {
+        for(User u: userRepository.findAll())
+        {
+            if(u.getUsername().equals(username)&& BCrypt.checkpw(password,u.getPassword()))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -49,7 +87,7 @@ public class UserService {
         AWSCredentials awsCredentials=new BasicAWSCredentials(ACCESS_KEY,SECRET_KEY);
         AmazonSNSClient snsClient= new AmazonSNSClient(awsCredentials);
 
-        String topicARN= "arn:aws:sns:us-east-1:124564112876:Csye6225Topic";
+        String topicARN= "arn:aws:sns:us-east-1:398590284929:Csye6225Topic";
         String msg=username+":"+ UUID.randomUUID().toString();
 
         PublishRequest publishRequest=new PublishRequest(topicARN,msg);
@@ -57,7 +95,6 @@ public class UserService {
         try
         {
             PublishResult publishResult=snsClient.publish(publishRequest);
-            System.out.println("publish successful");
             System.out.println(publishResult.toString());
 
             return true;
@@ -71,5 +108,11 @@ public class UserService {
 
 
     }
+
+
+
+
+
+
 
 }
