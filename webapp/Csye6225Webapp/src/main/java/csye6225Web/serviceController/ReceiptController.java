@@ -6,11 +6,13 @@ import csye6225Web.models.Transaction;
 import csye6225Web.repositories.ReceiptRepository;
 import csye6225Web.repositories.TransactionRepository;
 import csye6225Web.services.CloudWatchService;
+import csye6225Web.services.S3Service;
 import csye6225Web.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,9 @@ public class ReceiptController {
     private CloudWatchService cloudWatchService;
     @Autowired
     private UserService userService;
+    @Autowired
+     private S3Service s3Service;
+
 
 
     Double get_attachments=0.0;
@@ -65,7 +70,8 @@ public class ReceiptController {
     @PostMapping("/transaction/{id}/attachment")
     public ResponseEntity<Object> postNewAttachment(@RequestHeader(value="username",required = true) String username,
                                                     @RequestHeader(value="password",required = true) String password,
-                                                    @RequestBody Receipt receipt,@PathVariable long id)
+                                                    @RequestParam(value = "receipt", required = true) MultipartFile receipt,
+                                                    @PathVariable(value = "id") long id)
     {
 
 
@@ -77,18 +83,16 @@ public class ReceiptController {
         {
             if(tran.getId()==id)
             {
-                try
-                {
-                    receipt.setTransaction(tran);
-                    tran.getAttachments().add(receipt);
-                    receiptRepository.save(receipt);
-                    return ResponseEntity.ok().body(receipt);
+                String receiptURL=s3Service.uploadAttachment(username,receipt);
+                if(receiptURL==null){return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("attachment might not valid\n");}
 
-                } catch (Exception e)
-                {
-                    return ResponseEntity.badRequest().body(e);
-                }
+                    Receipt _receipt=new Receipt();
+                    _receipt.setUrl(receiptURL);
+                    _receipt.setTransaction(tran);
+                    tran.getAttachments().add(_receipt);
+                    receiptRepository.save(_receipt);
 
+                    return ResponseEntity.ok().body(_receipt);
 
             }
          }
@@ -100,10 +104,10 @@ public class ReceiptController {
      
     }
 
-    @PutMapping("transaction/{id}/attachment/{attachmentID}")
-    public ResponseEntity<Object> addNewAttachment(@RequestHeader(value="username",required = true) String username,
+    @PostMapping("transaction/{id}/attachment/{attachmentID}")
+    public ResponseEntity<Object> updateAttachment(@RequestHeader(value="username",required = true) String username,
                                                    @RequestHeader(value="password",required = true) String password,
-                                                   @RequestBody Receipt receipt,
+                                                   @RequestParam(value = "receipt", required = true) MultipartFile receipt,
                                                    @PathVariable(value="id") long id ,
                                                    @PathVariable(value="attachmentID") long attachID)
     {
@@ -115,24 +119,35 @@ public class ReceiptController {
            {
                if(tran.getId()==id)
                {
-                   try
-                   {
-                       receipt.setId(attachID);
-                       receipt.setTransaction(tran);
-                       receiptRepository.save(receipt);
-                       return ResponseEntity.ok().body(receipt);
 
-                   } catch (Exception e)
+                   for(Receipt rece:tran.getAttachments())
                    {
-                       return ResponseEntity.badRequest().body(e);
+
+                       if(rece.getId()==attachID)
+                       {
+
+                           try
+                           {
+                               s3Service.updateAttachment(username,rece.getUrl(),receipt);
+                               return ResponseEntity.ok().body(rece);
+
+                           } catch (Exception e)
+                           {
+                               return ResponseEntity.badRequest().body(e);
+                           }
+
+                       }
+
+
                    }
 
+                   return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Attachment ID NOT FOUND\n");
 
                }
             }
 
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID NOT FOUND");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transaction ID NOT FOUND\n");
            
     }
 
@@ -166,6 +181,7 @@ public class ReceiptController {
                         if (r.getId() == attachID)
                         {
 
+                            s3Service.deleteAttachment(username,r.getUrl());
                             tran.getAttachments().remove(r);
                             receiptRepository.deleteById(attachID);
                             return ResponseEntity.noContent().build();

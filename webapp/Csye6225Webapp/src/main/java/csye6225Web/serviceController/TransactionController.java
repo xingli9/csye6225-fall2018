@@ -6,6 +6,7 @@ import csye6225Web.repositories.ReceiptRepository;
 import csye6225Web.repositories.TransactionRepository;
 import csye6225Web.repositories.UserRepository;
 import csye6225Web.services.CloudWatchService;
+import csye6225Web.services.S3Service;
 import csye6225Web.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,9 @@ public class TransactionController {
     CloudWatchService cloudWatchService;
 
     @Autowired
+    S3Service s3Service;
+
+    @Autowired
     UserService userService;
 
     Double get_transactions=0.0;
@@ -45,13 +49,14 @@ public class TransactionController {
     Double delete_transaction=0.0;
 
     @GetMapping("/transactions")
-    public List<Transaction> getAllTransactions(@RequestHeader(value="username",required = true) String username,
+    public ResponseEntity<Object> getAllTransactions(@RequestHeader(value="username",required = true) String username,
                                                 @RequestHeader(value="password",required = true) String password)
     {
         cloudWatchService.putMetricData("GetRequest","/transactions",++get_transactions);
-        if(!userService.userIsValid(username,password)){return null;}
 
-        return userService.findUser(username).getTransactions();
+        if(!userService.userIsValid(username,password)){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username and password");}
+
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUser(username).getTransactions());
 
     }
 
@@ -60,23 +65,23 @@ public class TransactionController {
     @GetMapping("/transaction/{id}")
     public ResponseEntity<Object> getTransaction(@RequestHeader(value="username",required = true) String username,
                                                  @RequestHeader(value="password",required = true) String password,
-                                                 @PathVariable(value="id") Long id)
+                                                 @PathVariable(value="id") long id)
     {
 
         cloudWatchService.putMetricData("GetRequest","/transaction/{id}",++get_transaction);
         if(!userService.userIsValid(username,password)){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username and password");}
 
-
-        for(Transaction tran:userService.findUser(username).getTransactions())
+        for(Transaction tran: userService.findUser(username).getTransactions())
         {
             if(tran.getId()==id)
             {
                 return ResponseEntity.status(HttpStatus.OK).body(tran);
             }
+            System.out.println();
+
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID NOT FOUND\n");
-
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID NOT FOUND");
 
     }
 
@@ -84,20 +89,37 @@ public class TransactionController {
     @PostMapping("/transaction")
     public ResponseEntity<Object> createNewTransaction(@RequestHeader(value="username",required = true) String username,
                                                        @RequestHeader(value="password",required = true) String password,
-                                                       @RequestBody Transaction transaction)
+                                                       @RequestParam(value = "merchant", required = true) String merchant,
+                                                       @RequestParam(value = "amount",required = true) String amount,
+                                                       @RequestParam(value = "date", required = true) String date,
+                                                       @RequestParam(value = "category", required = true) String category,
+                                                       @RequestParam(value = "description", required = true) String description,
+                                                       @RequestParam(value = "receipt", required = true) MultipartFile receipt)
     {
 
         cloudWatchService.putMetricData("PostRequest","/transaction",++post_transaction);
         if(!userService.userIsValid(username,password)){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username and password");}
 
+        String receiptURL= s3Service.uploadAttachment(username,receipt);
+
+        if(receiptURL==null){return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("attachment might not valid\n");}
+
+        Receipt _receipt=new Receipt();
+        _receipt.setUrl(receiptURL);
 
 
-        try {
+        Transaction transaction= new Transaction();
+        transaction.setAmount(amount);
+        transaction.setCategory(category);
+        transaction.setDate(date);
+        transaction.setDescription(description);
+        transaction.setMerchant(merchant);
+        transaction.getAttachments().add(_receipt);
 
-            for(Receipt r:transaction.getAttachments())
-            {
-                r.setTransaction(transaction);
-            }
+
+        try
+        {
+            _receipt.setTransaction(transaction);
             userService.findUser(username).getTransactions().add(transaction);
             transaction.setUser(userService.findUser(username));
             transactionRepository.save(transaction);
@@ -111,10 +133,16 @@ public class TransactionController {
     }
 
 
-    @PutMapping("/transaction/{id}")
+    @PostMapping("/transaction/{id}")
     public ResponseEntity<Object> updateTransaction(@RequestHeader(value="username",required = true) String username,
                                                     @RequestHeader(value="password",required = true) String password,
-                                                    @RequestBody Transaction transaction ,@PathVariable Long id)
+                                                    @RequestParam(value = "merchant", required = true) String merchant,
+                                                    @RequestParam(value = "amount",required = true) String amount,
+                                                    @RequestParam(value = "description") String description,
+                                                    @RequestParam(value = "date", required = true) String date,
+                                                    @RequestParam(value = "category", required = true) String category,
+                                                    @RequestParam(value = "receipt", required = true) MultipartFile receipt,
+                                                    @PathVariable Long id)
     {
 
         cloudWatchService.putMetricData("PutRequest","/transaction/{id}",++put_transaction);
@@ -125,14 +153,15 @@ public class TransactionController {
         {
             if(id==tran.getId())
             {
-                transaction.setId(id);
-                transaction.setUser(userService.findUser(username));
-                for(Receipt r: transaction.getAttachments())
-                {
-                    r.setTransaction(transaction);
-                }
 
-                transactionRepository.save(transaction);
+                if(s3Service.updateAttachment(username,tran.getAttachments().get(0).getUrl(),receipt)==null){return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("attachment might not valid\n");}
+
+                tran.setDescription(description);
+                tran.setMerchant(merchant);
+                tran.setDate(date);
+                tran.setCategory(category);
+                tran.setAmount(amount);
+                transactionRepository.save(tran);
                 return ResponseEntity.status(HttpStatus.CREATED).body("Update Success!!\n");
             }
         }
@@ -155,6 +184,7 @@ public class TransactionController {
         if(!userService.userIsValid(username,password)){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username and password");}
 
 
+
         for(Transaction tran: userService.findUser(username).getTransactions())
         {
             if(id==tran.getId())
@@ -163,6 +193,7 @@ public class TransactionController {
                 userService.findUser(username).getTransactions().remove(tran);
                 for(Receipt r: tran.getAttachments())
                 {
+                    s3Service.deleteAttachment(username,r.getUrl());
                     receiptRepository.delete(r);
                 }
 
@@ -173,7 +204,6 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID NOT FOUND!!\n");
 
     }
-
 
 
 
